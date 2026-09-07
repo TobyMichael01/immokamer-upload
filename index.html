@@ -43,9 +43,19 @@
 <img id="preview" style="display:none;" />
 
 <script>
+  // ── CONFIGURATION ──
   const CLOUD_NAME = "z25nh0mn";
   const UPLOAD_PRESET = "immokamer_uploads";
-  const GLIDE_RETURN_URL = "https://immokamer-7a2n.glide.page/dl/4ecb83";
+
+  // This page now reads two things from its own URL so ONE page can serve
+  // every upload button in the app:
+  //   ?return=<the Glide screen URL to redirect back to>
+  //   ?target=<the query parameter name Glide should read, e.g. photo1_url>
+  // Example link to use in a Glide button:
+  //   https://tobymichael01.github.io/immokamer-upload/?return=https://immokamer-7a2n.glide.page/dl/f47fbb&target=photo1_url
+  const urlParams = new URLSearchParams(window.location.search);
+  const GLIDE_RETURN_URL = urlParams.get('return') || "https://immokamer-7a2n.glide.page/dl/4ecb83";
+  const TARGET_PARAM = urlParams.get('target') || "photo_url";
 
   const myWidget = cloudinary.createUploadWidget(
     {
@@ -53,7 +63,7 @@
       uploadPreset: UPLOAD_PRESET,
       sources: ['local', 'camera'],
       multiple: false,
-      maxFileSize: 10000000,
+      maxFileSize: 10000000, // 10MB
       language: 'fr',
       text: {
         fr: {
@@ -69,8 +79,9 @@
         document.getElementById('preview').src = imageUrl;
         document.getElementById('preview').style.display = 'block';
 
+        // Redirect back to Glide with the URL as a query parameter
         setTimeout(() => {
-          const redirectUrl = GLIDE_RETURN_URL + "?photo_url=" + encodeURIComponent(imageUrl);
+          const redirectUrl = GLIDE_RETURN_URL + "?" + TARGET_PARAM + "=" + encodeURIComponent(imageUrl);
           window.location.href = redirectUrl;
         }, 1200);
       } else if (error) {
