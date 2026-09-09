@@ -56,6 +56,8 @@
   const urlParams = new URLSearchParams(window.location.search);
   const GLIDE_RETURN_URL = urlParams.get('return') || "https://immokamer-7a2n.glide.page/dl/4ecb83";
   const TARGET_PARAM = urlParams.get('target') || "photo_url";
+  const ROW_ID = urlParams.get('rowid') || "";
+const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwxXZdOooBIR4TtIRXVIOgXD9RtOXHbjUEz9ktAwhmw5l4Gmq5b9DSm5LvpjkvyrsM-kQ/exec";
 
   const myWidget = cloudinary.createUploadWidget(
     {
@@ -81,6 +83,10 @@
 
         // Redirect back to Glide with the URL as a query parameter
         setTimeout(() => {
+          if (ROW_ID) {
+  fetch(WEBHOOK_URL + "?rowid=" + encodeURIComponent(ROW_ID) + "&target=" + encodeURIComponent(TARGET_PARAM) + "&url=" + encodeURIComponent(imageUrl))
+    .catch(err => console.error("Webhook error:", err));
+}
           const redirectUrl = GLIDE_RETURN_URL + "?" + TARGET_PARAM + "=" + encodeURIComponent(imageUrl);
           window.location.href = redirectUrl;
         }, 1200);
